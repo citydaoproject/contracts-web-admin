@@ -1,7 +1,7 @@
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
 
-const WEBPACK_SERVER_PORT = process.env.WEBPACK_SERVER_PORT || 5000;
+const WEBPACK_SERVER_PORT = process.env.WEBPACK_SERVER_PORT || 5001;
 
 const webpackConfig = (env, argv) => {
   const { mode } = argv;
