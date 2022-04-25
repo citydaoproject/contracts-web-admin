@@ -1,0 +1,148 @@
+service: CHANGEME
+
+plugins:
+  - serverless-finch
+
+provider:
+  name: aws
+  runtime: nodejs14.x
+  profile: serverless
+  stage: test
+  region: us-east-1
+
+custom:
+  stage: ${opt:stage, self:provider.stage}
+  client:
+    bucketName: ${self:service.name}-${self:custom.stage}
+    distributionFolder: dist
+    indexDocument: index.html
+    errorDocument: index.html
+    uploadOrder:
+      - .*
+      - index\.html
+    objectHeaders:
+      '*.bundle.*':
+        - name: Cache-Control
+          value: max-age=2592000 # 30 days
+      index.html:
+        - name: Cache-Control
+          value: no-cache
+  domainName: ${self:custom.domainNameStage.${self:custom.stage}}
+  domainNameStage:
+    test: test.${self:custom.baseDomainName}
+    prod: www.${self:custom.baseDomainName}
+  baseDomainName: ${custom.hostedZone}
+  hostedZone: CHANGEME.com
+  logs:
+    bucket: CHANGEME
+    path: websites/${self:service.name}/${self:custom.stage}/cloudfront
+
+resources:
+  Resources:
+    ## Specifying the S3 Bucket
+    WebAppS3Bucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: ${self:custom.client.bucketName}
+
+    ## Cloudfront Origin Access Identity
+    WebAppCloudFrontOriginAccessIdentity:
+      Type: AWS::CloudFront::CloudFrontOriginAccessIdentity
+      Properties:
+        CloudFrontOriginAccessIdentityConfig:
+          Comment: ${self:service.name}-${self:custom.stage}-oai
+
+    WebAppS3BucketPolicy:
+      Type: AWS::S3::BucketPolicy
+      Properties:
+        Bucket: !Ref WebAppS3Bucket
+        PolicyDocument:
+          Statement:
+            - Action: 's3:Get*'
+              Effect: Allow
+              Resource: 'arn:aws:s3:::${self:custom.client.bucketName}/*'
+              Principal:
+                CanonicalUser: !GetAtt WebAppCloudFrontOriginAccessIdentity.S3CanonicalUserId
+
+    ## Specifying the CloudFront Distribution to serve your Web Application
+    WebAppCloudFrontDistribution:
+      Type: AWS::CloudFront::Distribution
+      Properties:
+        DistributionConfig:
+          Origins:
+            - DomainName: ${self:custom.client.bucketName}.s3.amazonaws.com
+              ## An identifier for the origin which must be unique within the distribution
+              Id: WebApp
+              S3OriginConfig:
+                OriginAccessIdentity:
+                  !Join ['', ['origin-access-identity/cloudfront/', !Ref WebAppCloudFrontOriginAccessIdentity]]
+          Enabled: 'true'
+          HttpVersion: http2
+          Aliases:
+            - ${self:custom.domainName}
+          DefaultRootObject: index.html
+          ## Since the Single Page App is taking care of the routing we need to make sure every path is served with index.html
+          ## The only exception are files that actually exist e.g. app.js, reset.css
+          CustomErrorResponses:
+            - ErrorCode: 404
+              ResponseCode: 200
+              ResponsePagePath: /index.html
+            - ErrorCode: 403
+              ResponseCode: 200
+              ResponsePagePath: /index.html
+          DefaultCacheBehavior:
+            AllowedMethods:
+              - GET
+              - HEAD
+            ## The origin id defined above
+            TargetOriginId: WebApp
+            ## Defining if and how the QueryString and Cookies are forwarded to the origin which in this case is S3
+            ForwardedValues:
+              QueryString: false
+              Cookies:
+                Forward: none
+            ## The protocol that users can use to access the files in the origin. To allow HTTP use `allow-all`
+            ViewerProtocolPolicy: redirect-to-https
+          ## The certificate to use when viewers use HTTPS to request objects.
+          ViewerCertificate:
+            AcmCertificateArn:
+              Ref: WebAppCertificate
+            SslSupportMethod: sni-only
+            MinimumProtocolVersion: TLSv1.2_2021
+          Logging:
+            IncludeCookies: false
+            Bucket: ${self:custom.logs.bucket}.s3.amazonaws.com
+            Prefix: ${self:custom.logs.path}
+
+    WebAppCertificate:
+      Type: AWS::CertificateManager::Certificate
+      Properties:
+        DomainName: ${self:custom.domainName}
+        ValidationMethod: DNS
+
+    WebAppDomainName:
+      Type: AWS::Route53::RecordSetGroup
+      Properties:
+        HostedZoneName: ${self:custom.hostedZone}.
+        RecordSets:
+          - Name: ${self:custom.domainName}.
+            Type: CNAME
+            TTL: 60
+            ResourceRecords:
+              - Fn::GetAtt:
+                  - WebAppCloudFrontDistribution
+                  - DomainName
+
+  ## In order to print out the hosted domain via `serverless info` we need to define the DomainName output for CloudFormation
+  Outputs:
+    WebAppS3BucketOutput:
+      Value:
+        Ref: WebAppS3Bucket
+    WebAppCloudFrontDistributionOutput:
+      Value:
+        Fn::GetAtt:
+          - WebAppCloudFrontDistribution
+          - DomainName
+    WebAppCloudFrontDistributionRef:
+      Value:
+        Ref: WebAppCloudFrontDistribution
