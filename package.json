@@ -1,17 +1,17 @@
 {
-  "author": "Michael D. Norman",
-  "name": "CHANGEME",
+  "author": "CityDAO",
+  "name": "contracts-web-admin",
   "description": "",
   "private": true,
   "license": "UNLICENSED",
   "version": "0.0.0",
-  "homepage": "https://github.com/mdnorman/CHANGEME/wiki/Home",
+  "homepage": "https://github.com/citydaoproject/contracts-web-admin/wiki/Home",
   "repository": {
     "type": "git",
-    "url": "https://github.com/mdnorman/CHANGEME"
+    "url": "https://github.com/citydaoproject/contracts-web-admin"
   },
   "bugs": {
-    "url": "https://github.com/mdnorman/CHANGEME/issues"
+    "url": "https://github.com/citydaoproject/contracts-web-admin/issues"
   },
   "scripts": {
     "clean": "rm -rf dist && rm -rf out",
@@ -88,7 +88,7 @@
     }
   },
   "standard-version": {
-    "issueUrlFormat": "https://github.com/mdnorman/CHANGEME/issues/{{id}}",
+    "issueUrlFormat": "https://github.com/citydaoproject/contracts-web-admin/issues/{{id}}",
     "issuePrefixes": [
       "#"
     ],

@@ -1,4 +1,4 @@
-service: CHANGEME
+service: contracts-web-admin
 
 plugins:
   - serverless-finch
@@ -32,9 +32,9 @@ custom:
     test: test.${self:custom.baseDomainName}
     prod: www.${self:custom.baseDomainName}
   baseDomainName: ${custom.hostedZone}
-  hostedZone: CHANGEME.com
+  hostedZone: citydao.com
   logs:
-    bucket: CHANGEME
+    bucket: citydao-logs
     path: websites/${self:service.name}/${self:custom.stage}/cloudfront
 
 resources:
