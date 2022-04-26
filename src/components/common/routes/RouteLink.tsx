@@ -1,4 +1,4 @@
-import { Link, LinkProps } from '@mui/material';
+import Link, { LinkProps } from '@mui/material/Link';
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 

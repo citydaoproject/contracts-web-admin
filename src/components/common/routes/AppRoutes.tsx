@@ -1,12 +1,14 @@
 import * as React from 'react';
 import { Route, Routes } from 'react-router-dom';
-import { Main } from '../../../pages/home/Main';
+import DeployLogicPage from '../../../pages/deploy/DeployLogicPage';
+import { HomePage } from '../../../pages/home/HomePage';
 import { BadRoute } from '../../../pages/BadRoute';
-import { homePath } from './paths';
+import { deployLogicPath, homePath } from './paths';
 
 const AppRoutes = () => (
   <Routes>
-    <Route path={homePath} element={<Main />} />
+    <Route path={homePath} element={<HomePage />} />
+    <Route path={deployLogicPath} element={<DeployLogicPage />} />
     <Route path="*" element={<BadRoute />} />
   </Routes>
 );

@@ -1,4 +1,4 @@
-import { createTheme, Palette, responsiveFontSizes } from '@mui/material';
+import { createTheme, Palette, responsiveFontSizes } from '@mui/material/styles';
 
 export const createAppTheme = (useDarkMode: boolean) =>
   responsiveFontSizes(
