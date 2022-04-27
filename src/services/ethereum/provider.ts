@@ -169,3 +169,5 @@ export const addEthereumChain = async (chainId: number): Promise<boolean> => {
 export const isUserRejectedError = (e) => e.code === 4001;
 
 export const isNetworkNotFoundError = (e) => e.code === 4902;
+
+export const getEthereumSigner = (): ethers.providers.JsonRpcSigner | undefined => getEthereumProvider()?.getSigner();
