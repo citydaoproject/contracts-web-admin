@@ -1,13 +1,16 @@
 import React from 'react';
+import { useWallet } from '../../hooks/wallet';
 import DetailValue from '../common/typography/DetailValue';
 import ExternalLink, { ExternalLinkProps } from '../common/typography/ExternalLink';
 
 interface ContractLinkProps extends Omit<ExternalLinkProps, 'href'> {
   address: string;
-  blockExplorerUrl?: string | null;
 }
 
-const ContractLink = ({ address, blockExplorerUrl, onClick, ...rest }: ContractLinkProps) => {
+const ContractLink = ({ address, onClick, ...rest }: ContractLinkProps) => {
+  const { wallet } = useWallet();
+  const blockExplorerUrl = wallet?.network.blockExplorerUrls[0];
+
   if (!blockExplorerUrl) {
     return <DetailValue onClick={onClick}>{address}</DetailValue>;
   }

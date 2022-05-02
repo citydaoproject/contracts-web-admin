@@ -1,4 +1,5 @@
 import React from 'react';
+import { useWallet } from '../../hooks/wallet';
 import DetailValue from '../common/typography/DetailValue';
 import ExternalLink, { ExternalLinkProps } from '../common/typography/ExternalLink';
 import { TransactionStatus } from './transactionHooks';
@@ -7,16 +8,12 @@ import TransactionStatusIcon from './TransactionStatusIcon';
 interface TransactionLinkProps extends Omit<ExternalLinkProps, 'href'> {
   transactionHash: string;
   transactionStatus: TransactionStatus;
-  blockExplorerUrl?: string | null;
 }
 
-const TransactionLink = ({
-  transactionHash,
-  transactionStatus,
-  blockExplorerUrl,
-  onClick,
-  ...rest
-}: TransactionLinkProps) => {
+const TransactionLink = ({ transactionHash, transactionStatus, onClick, ...rest }: TransactionLinkProps) => {
+  const { wallet } = useWallet();
+  const blockExplorerUrl = wallet?.network.blockExplorerUrls[0];
+
   if (!blockExplorerUrl) {
     return (
       <DetailValue onClick={onClick}>

@@ -1,6 +1,5 @@
 import { TransactionRequest } from '@ethersproject/abstract-provider';
 import { useMemo } from 'react';
-import { WalletDetails } from '../../data/wallet';
 import LoaderButton from '../common/forms/LoaderButton';
 import DetailField from '../common/typography/DetailField';
 import DetailTitle from '../common/typography/DetailTitle';
@@ -9,28 +8,23 @@ import TransactionLink from '../transactions/TransactionLink';
 import ContractLink from './ContractLink';
 
 export interface DeployContractProps {
-  wallet: WalletDetails;
   transactionRequest: TransactionRequest;
-  findExistingContractAddress?: () => string | null | undefined;
-  onDeploy?: () => void;
+  existingContractAddress?: string | null;
+  onBeforeDeploy?: () => void;
   onDeployed?: (address: string) => void;
 }
 
 const DeployContract = ({
-  wallet,
   transactionRequest,
-  findExistingContractAddress,
-  onDeploy,
+  existingContractAddress,
+  onBeforeDeploy,
   onDeployed,
 }: DeployContractProps) => {
   const { execute, response, receipt, status, executing } = useExecuteTransaction(transactionRequest);
 
   const address = useMemo(() => {
-    if (findExistingContractAddress) {
-      const existingContractAddress = findExistingContractAddress();
-      if (existingContractAddress) {
-        return existingContractAddress;
-      }
+    if (existingContractAddress) {
+      return existingContractAddress;
     }
 
     if (receipt) {
@@ -41,8 +35,8 @@ const DeployContract = ({
   }, [response?.hash, receipt]);
 
   const handleDeploy = async () => {
-    if (onDeploy) {
-      onDeploy();
+    if (onBeforeDeploy) {
+      onBeforeDeploy();
     }
 
     const receipt = await execute();
@@ -55,24 +49,18 @@ const DeployContract = ({
     }
   };
 
-  const blockExplorerUrl = wallet.network.blockExplorerUrls[0];
-
   return (
     <>
       {address ? (
         <DetailField>
           <DetailTitle>Address</DetailTitle>
-          <ContractLink address={address} blockExplorerUrl={blockExplorerUrl} />
+          <ContractLink address={address} />
         </DetailField>
       ) : null}
       {response ? (
         <DetailField>
           <DetailTitle>Transaction</DetailTitle>
-          <TransactionLink
-            transactionHash={response.hash}
-            transactionStatus={status}
-            blockExplorerUrl={blockExplorerUrl}
-          />
+          <TransactionLink transactionHash={response.hash} transactionStatus={status} />
         </DetailField>
       ) : null}
       <DetailField>

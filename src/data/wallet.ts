@@ -22,3 +22,8 @@ export const walletStatusState = selector<WalletStatus>({
   key: 'walletStatus',
   get: ({ get }): WalletStatus => get(walletState).walletStatus,
 });
+
+export const networkNameState = selector<string | null>({
+  key: 'networkName',
+  get: ({ get }): string | null => get(walletState).wallet?.network.key || null,
+});

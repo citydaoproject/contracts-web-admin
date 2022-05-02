@@ -2,7 +2,6 @@ import React from 'react';
 import { WalletDetails } from '../../data/wallet';
 import SectionTitle from '../common/typography/SectionTitle';
 import DeployLogicContract from './DeployLogicContract';
-import DeployParcelNFTProxy from './DeployParcelNFTProxy';
 import { logicContractDefinitions } from './logicContracts';
 
 export interface DeployContractsSectionProps {
@@ -19,7 +18,6 @@ const DeployContractsSection = ({ wallet }: DeployContractsSectionProps) => (
         wallet={wallet}
       />
     ))}
-    <DeployParcelNFTProxy wallet={wallet} />
   </>
 );
 export default DeployContractsSection;
