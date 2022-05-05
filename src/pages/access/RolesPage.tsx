@@ -18,7 +18,11 @@ const RolesPage = () => {
 
   return (
     <PageContainer>
-      <RolesSection wallet={wallet} type={rolesParams.type as LogicContractType} address={rolesParams.address} />
+      <RolesSection
+        wallet={wallet}
+        type={rolesParams.type as LogicContractType}
+        contractAddress={rolesParams.address}
+      />
     </PageContainer>
   );
 };

@@ -51,21 +51,27 @@ export const useFetchTransaction = (transactionHash: string | null): FetchTransa
 };
 
 export interface ExecuteTransactionHook extends FetchTransactionHook {
-  execute: () => Promise<TransactionReceipt | null>;
+  execute: (overrideTransactionRequest?: TransactionRequest) => Promise<TransactionReceipt | null>;
   executing: boolean;
 }
 
-export const useExecuteTransaction = (transactionRequest: TransactionRequest): ExecuteTransactionHook => {
+export const useExecuteTransaction = (transactionRequest?: TransactionRequest): ExecuteTransactionHook => {
   const [response, setResponse] = useState<TransactionResponse | null>(null);
   const [receipt, setReceipt] = useState<TransactionReceipt | null>(null);
   const [status, setStatus] = useState<TransactionStatus>(TransactionStatus.Pending);
   const [executing, setExecuting] = useState(false);
 
-  const execute = async () => {
+  const execute = async (overrideTransactionRequest?: TransactionRequest) => {
     setExecuting(true);
 
+    const request = overrideTransactionRequest || transactionRequest;
+    if (!request) {
+      console.warn('No transaction request provided');
+      return null;
+    }
+
     try {
-      const response = await executeTransaction(transactionRequest);
+      const response = await executeTransaction(request);
       setResponse(response);
 
       if (!response) {
@@ -73,7 +79,7 @@ export const useExecuteTransaction = (transactionRequest: TransactionRequest): E
         return null;
       }
 
-      await repeatUntil(() => fetchTransactionReceipt(response?.hash));
+      await repeatUntil(() => fetchTransactionReceipt(response.hash));
 
       return getTransactionReceipt(response.hash);
     } finally {
@@ -97,7 +103,7 @@ const determineTransactionStatus = (receipt: TransactionReceipt | null): Transac
     return TransactionStatus.Pending;
   }
 
-  if (receipt.confirmations > 1) {
+  if (receipt.confirmations > 0) {
     return TransactionStatus.Confirmed;
   }
 

@@ -21,3 +21,6 @@ export const knownRoles = [
   pauserRoleDescription,
   upgraderRoleDescription,
 ];
+
+export const findRoleDescriptionById = (id: string): RoleDescription | undefined =>
+  knownRoles.find((role) => role.id === id);

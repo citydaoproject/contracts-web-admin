@@ -25,7 +25,7 @@ export const useContractLoader = <
 >(
   factory: F,
   address: string,
-  keys: K[],
+  keys: K[] = [],
 ): ContractLoaderHook<C, K> => {
   const { wallet } = useWallet();
 
