@@ -1,6 +1,8 @@
 import IconButton from '@mui/material/IconButton';
-import React, { useMemo } from 'react';
+import { ethers } from 'ethers';
+import React from 'react';
 import { useFormFields } from '../../hooks/forms';
+import { isValidAddress } from '../../utils/constants';
 import RemoveIcon from '../common/actions/RemoveIcon';
 import DefaultButton from '../common/forms/DefaultButton';
 import DefaultTextField from '../common/forms/DefaultTextField';
@@ -22,9 +24,11 @@ interface AddressListFields {
 }
 
 const AddressList = ({ title, addresses, disabled, onAddAddress, onRemoveAddress }: AddressListProps) => {
-  const { fields, handleFieldChange, setFieldValue } = useFormFields<AddressListFields>({ newAddress: '' });
+  const { fields, handleFieldChange, setFieldValue, resetFields } = useFormFields<AddressListFields>({
+    newAddress: '',
+  });
 
-  const formValid = useMemo(() => !!fields.newAddress, [fields.newAddress]);
+  const formValid = fields.newAddress && isValidAddress(fields.newAddress);
 
   const handleAddAddress = () => {
     if (!onAddAddress) {
@@ -36,8 +40,8 @@ const AddressList = ({ title, addresses, disabled, onAddAddress, onRemoveAddress
       return;
     }
 
-    onAddAddress(newAddress);
-    setFieldValue('newAddress', '');
+    onAddAddress(ethers.utils.getAddress(newAddress));
+    resetFields();
   };
 
   const handleRemoveAddress = (address: string) => {

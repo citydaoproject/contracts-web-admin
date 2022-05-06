@@ -1,4 +1,6 @@
-import { ProxyContractInfo } from '../../data/proxyContracts';
+import { useSetRecoilState } from 'recoil';
+import { networkProxyContractSelector, ProxyContractInfo } from '../../data/proxyContracts';
+import DefaultButton from '../common/forms/DefaultButton';
 import { buildRolesPath } from '../common/routes/paths';
 import RouteButton from '../common/routes/RouteButton';
 import DetailField from '../common/typography/DetailField';
@@ -14,6 +16,15 @@ export interface ProxyContractSectionProps {
 
 const ProxyContractSection = ({ proxyContractInfo }: ProxyContractSectionProps) => {
   const { roles } = getLogicContractDefinition(proxyContractInfo.type);
+
+  const setProxyContracts = useSetRecoilState(networkProxyContractSelector);
+
+  const handleRemove = () => {
+    setProxyContracts((prevProxyContracts) =>
+      prevProxyContracts.filter((value) => value.address !== proxyContractInfo.address),
+    );
+  };
+
   return (
     <>
       <SubSectionTitle>{proxyContractInfo.type} Proxy</SubSectionTitle>
@@ -25,7 +36,10 @@ const ProxyContractSection = ({ proxyContractInfo }: ProxyContractSectionProps) 
       <DetailField>
         {roles.length > 0 ? (
           <RouteButton path={buildRolesPath(proxyContractInfo.type, proxyContractInfo.address)}>Edit Roles</RouteButton>
-        ) : null}
+        ) : null}{' '}
+        <DefaultButton color="warning" onClick={handleRemove}>
+          Remove
+        </DefaultButton>
       </DetailField>
     </>
   );

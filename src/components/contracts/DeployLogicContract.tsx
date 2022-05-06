@@ -18,6 +18,14 @@ const DeployLogicContract = ({ logicContractDefinition, wallet }: DeployLogicCon
     getNetworkLogicContractSelector(logicContractDefinition.type),
   );
 
+  const handleDeployed = (address: string) => {
+    setLogicContract({ networkName, type: logicContractDefinition.type, address });
+  };
+
+  const handleClearContract = () => {
+    setLogicContract(null);
+  };
+
   return (
     <>
       <SubSectionTitle>{logicContractDefinition.type} Logic</SubSectionTitle>
@@ -25,7 +33,8 @@ const DeployLogicContract = ({ logicContractDefinition, wallet }: DeployLogicCon
         transactionRequest={logicContractDefinition.factory().getDeployTransaction()}
         existingContractAddress={logicContract?.address}
         onBeforeDeploy={() => setLogicContract(null)}
-        onDeployed={(address) => setLogicContract({ networkName, type: logicContractDefinition.type, address })}
+        onDeployed={handleDeployed}
+        onClearContract={handleClearContract}
       />
       {logicContract?.address ? (
         <DeployProxyContractPicker

@@ -20,7 +20,7 @@ interface DeployParcelNFTProxyFields {
 }
 
 const DeployParcelNFTProxy = ({ wallet, logicAddress }: DeployParcelNFTProxyProps) => {
-  const { fields, handleFieldChange } = useFormFields<DeployParcelNFTProxyFields>({
+  const { fields, handleFieldChange, resetFields } = useFormFields<DeployParcelNFTProxyFields>({
     name: '',
     symbol: '',
   });
@@ -35,6 +35,7 @@ const DeployParcelNFTProxy = ({ wallet, logicAddress }: DeployParcelNFTProxyProp
       ...prevProxyContracts,
       { networkName, type: LogicContractType.ParcelNFT, address: contractAddress },
     ]);
+    resetFields();
     gotoContracts();
   };
 
@@ -42,7 +43,6 @@ const DeployParcelNFTProxy = ({ wallet, logicAddress }: DeployParcelNFTProxyProp
     <>
       <SubSectionTitle>ParcelNFT Proxy</SubSectionTitle>
       <DefaultTextField
-        autoFocus
         name="name"
         type="text"
         label="Name"
