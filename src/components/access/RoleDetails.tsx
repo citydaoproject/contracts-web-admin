@@ -22,7 +22,7 @@ const RoleDetails = ({ wallet, role, details, executing, onAddToRole, onRemoveFr
     <SubSectionTitle>{role.name}</SubSectionTitle>
     {details ? (
       <DetailField>
-        <DetailTitle>AdminRole</DetailTitle>
+        <DetailTitle>Admin Role</DetailTitle>
         <DetailValue>{findRoleDescriptionById(details.adminRole)?.name || details.adminRole}</DetailValue>
         <DetailTitle>Accounts</DetailTitle>
         {details.assignments.map((assignment) => (

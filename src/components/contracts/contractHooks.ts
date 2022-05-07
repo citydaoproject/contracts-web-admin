@@ -6,6 +6,7 @@ import { attachContract, FactoryContract } from '../../services/ethereum/contrac
 export interface ContractLoaderHook<C extends Contract, K extends KeyOfGetterFunction<C>> {
   contract?: C;
   values?: ContractValues<C, K>;
+  refetch: () => Promise<void>;
 }
 
 export type ContractValues<C extends Contract, K extends KeyOfGetterFunction<C>> = {
@@ -53,5 +54,5 @@ export const useContractLoader = <
     );
   };
 
-  return { contract, values };
+  return { contract, values, refetch: fetchValues };
 };
