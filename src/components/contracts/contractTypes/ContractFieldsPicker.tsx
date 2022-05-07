@@ -1,5 +1,5 @@
 import { LogicContractType } from '../logicContracts';
-import ParcelNFTContractFields from './ParcelNFTContractFields';
+import ParcelNFTContractFields from './parcelNFT/ParcelNFTContractFields';
 
 export interface ContractFieldsPickerProps {
   type: LogicContractType;

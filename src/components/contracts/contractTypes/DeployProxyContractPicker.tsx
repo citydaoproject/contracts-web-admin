@@ -1,6 +1,6 @@
 import { WalletDetails } from '../../../data/wallet';
 import { LogicContractType } from '../logicContracts';
-import DeployParcelNFTProxy from './DeployParcelNFTProxy';
+import DeployParcelNFTProxy from './parcelNFT/DeployParcelNFTProxy';
 
 export interface ContractDeployProxyPickerProps {
   wallet: WalletDetails;
