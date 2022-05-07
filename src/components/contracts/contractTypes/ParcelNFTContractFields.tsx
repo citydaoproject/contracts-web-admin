@@ -15,6 +15,8 @@ export interface ParcelNFTContractFieldsProps {
 
 interface ParcelNFTFormFields {
   newBaseURI: string;
+  newTokenURI: string;
+  newTokenURITokenId: string;
 }
 
 const ParcelNFTContractFields = ({ address }: ParcelNFTContractFieldsProps) => {
@@ -23,7 +25,12 @@ const ParcelNFTContractFields = ({ address }: ParcelNFTContractFieldsProps) => {
     refetch,
     contract: parcelNFT,
   } = useContractLoader(new ParcelNFT__factory(), address, ['name', 'symbol', 'baseURI']);
-  const { fields, handleFieldChange, resetFields } = useFormFields<ParcelNFTFormFields>({ newBaseURI: '' });
+
+  const { fields, handleFieldChange, setFieldValue } = useFormFields<ParcelNFTFormFields>({
+    newBaseURI: '',
+    newTokenURI: '',
+    newTokenURITokenId: '',
+  });
 
   const { execute, executing } = useExecuteTransaction();
 
@@ -41,9 +48,27 @@ const ParcelNFTContractFields = ({ address }: ParcelNFTContractFieldsProps) => {
       return;
     }
 
-    resetFields();
+    await refetch();
+
+    setFieldValue('newBaseURI', '');
+  };
+
+  const handleSetTokenURI = async () => {
+    if (!parcelNFT) {
+      console.warn('Parcel NFT Contract not loaded');
+      return;
+    }
+
+    if (
+      !(await execute(await parcelNFT.populateTransaction.setTokenURI(fields.newTokenURITokenId, fields.newTokenURI)))
+    ) {
+      return;
+    }
 
     await refetch();
+
+    setFieldValue('newTokenURI', '');
+    setFieldValue('newTokenURITokenId', '');
   };
 
   return (
@@ -70,6 +95,29 @@ const ParcelNFTContractFields = ({ address }: ParcelNFTContractFieldsProps) => {
         />
         <DefaultButton disabled={executing} onClick={handleSetBaseURI}>
           Update Base URI
+        </DefaultButton>
+      </DetailField>
+      <DetailField>
+        <DefaultTextField
+          name="newTokenURI"
+          type="text"
+          label="New Token URI"
+          autoComplete="off"
+          value={fields.newTokenURI}
+          required
+          onChange={handleFieldChange}
+        />
+        <DefaultTextField
+          name="newTokenURITokenId"
+          type="text"
+          label="Token ID for new URI"
+          autoComplete="off"
+          value={fields.newTokenURITokenId}
+          required
+          onChange={handleFieldChange}
+        />
+        <DefaultButton disabled={executing} onClick={handleSetTokenURI}>
+          Set Token URI for Token ID
         </DefaultButton>
       </DetailField>
     </>

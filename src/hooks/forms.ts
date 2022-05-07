@@ -4,7 +4,7 @@ export type FormFieldTextChangeEvent = ChangeEvent<HTMLInputElement | HTMLTextAr
 
 export interface FormFieldsHook<S> {
   fields: S;
-  setFieldValue: (name: string, value: any) => void;
+  setFieldValue: (name: keyof S, value: any) => void;
   handleFieldChange: (event: FormFieldTextChangeEvent) => string;
   resetFields: () => void;
 }
@@ -12,7 +12,7 @@ export interface FormFieldsHook<S> {
 export const useFormFields = <S>(initialState: S): FormFieldsHook<S> => {
   const [fields, setValues] = useState<S>(initialState);
 
-  const setFieldValue = (name: string, value: any) => {
+  const setFieldValue = (name: keyof S, value: any) => {
     setValues({
       ...fields,
       [name]: value,
@@ -21,7 +21,7 @@ export const useFormFields = <S>(initialState: S): FormFieldsHook<S> => {
 
   const handleFieldChange = (event: FormFieldTextChangeEvent) => {
     const { name, value } = event.target;
-    setFieldValue(name, value);
+    setFieldValue(name as keyof S, value);
     return value;
   };
 
