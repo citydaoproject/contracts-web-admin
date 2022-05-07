@@ -88,6 +88,7 @@ const webpackConfig = (env, argv) => {
         { test: /\.(png|woff|woff2|eot|ttf)$/, loader: 'url-loader' },
       ],
     },
+    ignoreWarnings: [/Failed to parse source map/],
   };
 };
 
