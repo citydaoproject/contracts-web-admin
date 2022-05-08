@@ -1,5 +1,5 @@
 import React from 'react';
-import { ParcelNFT } from '../../../../../../parcel-contracts/dist/types/contracts';
+import { ParcelNFT } from '@citydao/parcel-contracts/dist/types/contracts';
 import { useFormFields } from '../../../../hooks/forms';
 import DefaultTextField from '../../../common/forms/DefaultTextField';
 import LoaderButton from '../../../common/forms/LoaderButton';
