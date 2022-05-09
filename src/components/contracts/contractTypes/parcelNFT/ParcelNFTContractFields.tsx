@@ -6,6 +6,7 @@ import DetailValue from '../../../common/typography/DetailValue';
 import { useContractLoader } from '../../contractHooks';
 import BaseURIEditor from './BaseURIEditor';
 import DefaultRoyaltyEditor from './DefaultRoyaltyEditor';
+import MerkleRootEditor from './MerkleRootEditor';
 import TokenRoyaltyEditor from './TokenRoyaltyEditor';
 import TokenURIEditor from './TokenURIEditor';
 
@@ -18,7 +19,7 @@ const ParcelNFTContractFields = ({ address }: ParcelNFTContractFieldsProps) => {
     contract: parcelNFT,
     values,
     refetch,
-  } = useContractLoader(new ParcelNFT__factory(), address, ['name', 'symbol', 'baseURI']);
+  } = useContractLoader(new ParcelNFT__factory(), address, ['name', 'symbol', 'baseURI', 'merkleRoot']);
 
   if (!values || !parcelNFT) {
     return <div>Loading ParcelNFT Fields</div>;
@@ -36,6 +37,7 @@ const ParcelNFTContractFields = ({ address }: ParcelNFTContractFieldsProps) => {
       </DetailField>
       <BaseURIEditor parcelNFT={parcelNFT} baseURI={values.baseURI} onChange={refetch} />
       <TokenURIEditor parcelNFT={parcelNFT} />
+      <MerkleRootEditor parcelNFT={parcelNFT} merkleRoot={values.merkleRoot} onChange={refetch} />
       <DefaultRoyaltyEditor parcelNFT={parcelNFT} />
       <TokenRoyaltyEditor parcelNFT={parcelNFT} />
     </>
