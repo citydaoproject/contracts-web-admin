@@ -7,6 +7,7 @@ import DetailField from '../../../common/typography/DetailField';
 import DetailTitle from '../../../common/typography/DetailTitle';
 import DetailValue from '../../../common/typography/DetailValue';
 import { useExecuteTransaction } from '../../../transactions/transactionHooks';
+import GenerateMerkleRoot from './GenerateMerkleRoot';
 
 export interface MerkleRootEditorProps {
   parcelNFT: ParcelNFT;
@@ -19,7 +20,7 @@ interface MerkleRootFields {
 }
 
 const MerkleRootEditor = ({ parcelNFT, merkleRoot, onChange }: MerkleRootEditorProps) => {
-  const { fields, handleFieldChange, resetFields } = useFormFields<MerkleRootFields>({
+  const { fields, handleFieldChange, setFieldValue, resetFields } = useFormFields<MerkleRootFields>({
     merkleRoot: '',
   });
 
@@ -35,6 +36,10 @@ const MerkleRootEditor = ({ parcelNFT, merkleRoot, onChange }: MerkleRootEditorP
     if (onChange) {
       onChange(fields.merkleRoot);
     }
+  };
+
+  const handleGenerateMerkleRoot = (generatedMerkelRoot) => {
+    setFieldValue('merkleRoot', generatedMerkelRoot);
   };
 
   return (
@@ -53,6 +58,7 @@ const MerkleRootEditor = ({ parcelNFT, merkleRoot, onChange }: MerkleRootEditorP
       <LoaderButton loading={executing} onClick={handleSetMerkleRoot}>
         Update Merkle Root
       </LoaderButton>
+      <GenerateMerkleRoot onGenerateMerkleRoot={handleGenerateMerkleRoot} />
     </DetailField>
   );
 };

@@ -1,5 +1,6 @@
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
+const webpack = require('webpack');
 
 const WEBPACK_SERVER_PORT = process.env.WEBPACK_SERVER_PORT || 5001;
 
@@ -8,7 +9,12 @@ const webpackConfig = (env, argv) => {
   const production = mode === 'production';
   const development = !production;
   const analyze = false;
-  const plugins = [new HtmlWebpackPlugin({ template: 'src/index.html.ejs' })];
+  const plugins = [
+    new HtmlWebpackPlugin({ template: 'src/index.html.ejs' }),
+    new webpack.ProvidePlugin({
+      Buffer: ['buffer', 'Buffer'],
+    }),
+  ];
 
   if (analyze) {
     plugins.push(
