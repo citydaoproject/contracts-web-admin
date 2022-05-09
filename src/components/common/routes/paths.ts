@@ -6,6 +6,9 @@ export const homePath = '/';
 export const deployPath = '/deploy';
 export const contractsPath = '/contracts';
 
+export const merkleTreesPath = '/merkle-trees';
+export const newMerkleTreesPath = `${merkleTreesPath}/new`;
+
 export const rolesBasePath = '/roles';
 export interface RolesParams {
   type: LogicContractType;
@@ -22,6 +25,7 @@ export const usePaths = () => {
     gotoHome: () => navigate(homePath),
     gotoDeploy: () => navigate(deployPath),
     gotoContracts: () => navigate(contractsPath),
+    gotoMerkleTrees: () => navigate(merkleTreesPath),
     gotoRoles: (type: LogicContractType, address: string) => navigate(buildRolesPath(type, address)),
   };
 };

@@ -57,7 +57,7 @@ const AddressList = ({ title, addresses, disabled, onAddAddress, onRemoveAddress
 
   return (
     <DetailField>
-      <DetailTitle>{title ? title : 'Wallet Addresses'}</DetailTitle>
+      <DetailTitle>{title || 'Wallet Addresses'}</DetailTitle>
       {onAddAddress ? (
         <>
           <DefaultTextField

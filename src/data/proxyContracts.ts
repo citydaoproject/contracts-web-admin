@@ -31,17 +31,17 @@ export const networkProxyContractSelector = selector<ProxyContractInfo[]>({
       return;
     }
 
-    const logicContracts = cloneMap(get(proxyContractsState));
+    const proxyContracts = cloneMap(get(proxyContractsState));
     if (newValue instanceof DefaultValue || newValue === null) {
       removeProxyContracts(networkName);
-      logicContracts.delete(buildNetworkProxySelectorKey(networkName));
-      set(proxyContractsState, logicContracts);
+      proxyContracts.delete(buildNetworkProxySelectorKey(networkName));
+      set(proxyContractsState, proxyContracts);
       return;
     }
 
     updateProxyContracts(networkName, newValue);
-    logicContracts.set(buildNetworkProxySelectorKey(networkName), newValue);
-    set(proxyContractsState, logicContracts);
+    proxyContracts.set(buildNetworkProxySelectorKey(networkName), newValue);
+    set(proxyContractsState, proxyContracts);
   },
 });
 

@@ -13,10 +13,10 @@ export const useFormFields = <S>(initialState: S): FormFieldsHook<S> => {
   const [fields, setValues] = useState<S>(initialState);
 
   const setFieldValue = (name: keyof S, value: any) => {
-    setValues({
-      ...fields,
+    setValues((currentFields) => ({
+      ...currentFields,
       [name]: value,
-    });
+    }));
   };
 
   const handleFieldChange = (event: FormFieldTextChangeEvent) => {
