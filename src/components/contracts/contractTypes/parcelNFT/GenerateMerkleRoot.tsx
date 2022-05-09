@@ -1,11 +1,11 @@
-import IconButton from '@mui/material/IconButton';
-import { BigNumberish } from 'ethers';
-import React, { useState } from 'react';
+import { EthereumAddress } from '@citydao/parcel-contracts/src/constants/accounts';
 import {
   AllowListByAddress,
   buildMerkleTreeForAllowList,
 } from '@citydao/parcel-contracts/src/contracts/AllowListClaim';
-import { EthereumAddress } from '../../../../../../parcel-contracts/src/constants/accounts';
+import IconButton from '@mui/material/IconButton';
+import { BigNumberish } from 'ethers';
+import React, { useState } from 'react';
 import { useFormFields } from '../../../../hooks/forms';
 import { isValidAddress } from '../../../../utils/constants';
 import { isTextPositiveInt } from '../../../../utils/strings';

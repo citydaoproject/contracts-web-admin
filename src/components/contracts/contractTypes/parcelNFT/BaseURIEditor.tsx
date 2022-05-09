@@ -15,25 +15,25 @@ export interface BaseURIEditorProps {
 }
 
 interface BaseURIFields {
-  newBaseURI: string;
+  baseURI: string;
 }
 
 const BaseURIEditor = ({ parcelNFT, baseURI, onChange }: BaseURIEditorProps) => {
   const { fields, handleFieldChange, resetFields } = useFormFields<BaseURIFields>({
-    newBaseURI: '',
+    baseURI: '',
   });
 
   const { execute, executing } = useExecuteTransaction();
 
   const handleSetBaseURI = async () => {
-    if (!(await execute(await parcelNFT.populateTransaction.setBaseURI(fields.newBaseURI)))) {
+    if (!(await execute(await parcelNFT.populateTransaction.setBaseURI(fields.baseURI)))) {
       return;
     }
 
     resetFields();
 
     if (onChange) {
-      onChange(fields.newBaseURI);
+      onChange(fields.baseURI);
     }
   };
 
@@ -42,11 +42,11 @@ const BaseURIEditor = ({ parcelNFT, baseURI, onChange }: BaseURIEditorProps) => 
       <DetailTitle>Base URI</DetailTitle>
       <DetailValue>{baseURI}</DetailValue>
       <DefaultTextField
-        name="newBaseURI"
+        name="baseURI"
         type="text"
         label="New Base URI"
         autoComplete="off"
-        value={fields.newBaseURI}
+        value={fields.baseURI}
         required
         onChange={handleFieldChange}
       />

@@ -5,6 +5,7 @@ import DetailTitle from '../../../common/typography/DetailTitle';
 import DetailValue from '../../../common/typography/DetailValue';
 import { useContractLoader } from '../../contractHooks';
 import BaseURIEditor from './BaseURIEditor';
+import ClaimPeriodEditor from './ClaimPeriodEditor';
 import DefaultRoyaltyEditor from './DefaultRoyaltyEditor';
 import MerkleRootEditor from './MerkleRootEditor';
 import TokenRoyaltyEditor from './TokenRoyaltyEditor';
@@ -37,6 +38,7 @@ const ParcelNFTContractFields = ({ address }: ParcelNFTContractFieldsProps) => {
       </DetailField>
       <BaseURIEditor parcelNFT={parcelNFT} baseURI={values.baseURI} onChange={refetch} />
       <TokenURIEditor parcelNFT={parcelNFT} />
+      <ClaimPeriodEditor parcelNFT={parcelNFT} />
       <MerkleRootEditor parcelNFT={parcelNFT} merkleRoot={values.merkleRoot} onChange={refetch} />
       <DefaultRoyaltyEditor parcelNFT={parcelNFT} />
       <TokenRoyaltyEditor parcelNFT={parcelNFT} />
