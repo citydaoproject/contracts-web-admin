@@ -18,7 +18,11 @@ const GenerateAllowListMerkleTree = ({ onGenerateMerkleTree }: GenerateAllowList
   const [allowList, setAllowList] = useState<AllowListByAddress>({});
 
   const handleAddAllowance = (account: EthereumAddress, allowance: BigNumberish) => {
-    setAllowList({ ...allowList, [account]: allowance });
+    setAllowList((existingAllowList) => ({ ...existingAllowList, [account]: allowance }));
+  };
+
+  const handleAddAllowances = (allowances: AllowListByAddress) => {
+    setAllowList((existingAllowList) => ({ ...existingAllowList, ...allowances }));
   };
 
   const handleRemoveAllowance = (account: EthereumAddress, _allowance: BigNumberish) => {
@@ -45,6 +49,7 @@ const GenerateAllowListMerkleTree = ({ onGenerateMerkleTree }: GenerateAllowList
         title="Generate Merkle Tree"
         allowList={allowList}
         onAddAllowance={handleAddAllowance}
+        onAddAllowances={handleAddAllowances}
         onRemoveAllowance={handleRemoveAllowance}
       />
       <DefaultButton onClick={handleGenerateMerkleTree}>Generate Merkle Tree</DefaultButton>

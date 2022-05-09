@@ -1,5 +1,7 @@
 import { EthereumAddress } from '@citydao/parcel-contracts/src/constants/accounts';
 import { AllowListByAddress } from '@citydao/parcel-contracts/src/contracts/AllowListClaim';
+import { css } from '@emotion/react';
+import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
 import { BigNumberish } from 'ethers';
 import React from 'react';
@@ -19,6 +21,7 @@ export interface AllowListMerkleTreeAllowancesProps {
   title?: string;
   allowList: AllowListByAddress;
   onAddAllowance?: (address: EthereumAddress, allowance: BigNumberish) => void;
+  onAddAllowances?: (allowances: AllowListByAddress) => void;
   onRemoveAllowance?: (address: EthereumAddress, allowance: BigNumberish) => void;
   disabled?: boolean;
 }
@@ -32,6 +35,7 @@ const AllowListMerkleTreeAllowances = ({
   title,
   allowList,
   onAddAllowance,
+  onAddAllowances,
   onRemoveAllowance,
   disabled,
 }: AllowListMerkleTreeAllowancesProps) => {
@@ -61,6 +65,59 @@ const AllowListMerkleTreeAllowances = ({
     }
   };
 
+  const handleUploadFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (!event.target.files) {
+      console.log('no files');
+      return;
+    }
+
+    const allowancesText = await getAsText(event.target.files[0]);
+    const allowances = JSON.parse(allowancesText);
+
+    if (onAddAllowances) {
+      onAddAllowances(allowances);
+    } else if (onAddAllowance) {
+      Object.keys(allowances).forEach((account) => {
+        onAddAllowance(account, allowances[account]);
+      });
+    }
+  };
+
+  const getAsText = (readFile) => {
+    const reader = new FileReader();
+
+    // Read file into memory as UTF-16
+    reader.readAsText(readFile, 'UTF-8');
+
+    const promise = new Promise<string>((resolve, reject) => {
+      reader.onload = (event) => {
+        if (!event.target || !event.target.result) {
+          reject('No data');
+          return;
+        }
+
+        const result = event.target.result.toString();
+        resolve(result);
+      };
+
+      reader.onerror = (event) => {
+        if (!event.target || !event.target.error) {
+          reject('No error');
+          return;
+        }
+
+        reject(event.target.error.name);
+      };
+    });
+
+    // Handle progress, success, and errors
+    reader.onprogress = (event) => {
+      console.log(`Loading file: ${(event.loaded / event.total) * 100}%`);
+    };
+
+    return promise;
+  };
+
   return (
     <DetailField>
       <DetailTitle>{title || 'Allowances'}</DetailTitle>
@@ -86,6 +143,21 @@ const AllowListMerkleTreeAllowances = ({
           <DefaultButton disabled={!formValid || disabled} onClick={handleAddAllowance}>
             Add Allowance
           </DefaultButton>
+
+          <DetailField>
+            <input
+              id="button-file-input"
+              type="file"
+              accept="text/json"
+              css={css`
+                display: none;
+              `}
+              onChange={handleUploadFileChange}
+            />
+            <label htmlFor="button-file-input">
+              <Button component="span">Upload Allowance List</Button>
+            </label>
+          </DetailField>
         </>
       ) : null}
 
