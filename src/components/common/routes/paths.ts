@@ -7,7 +7,7 @@ export const deployPath = '/deploy';
 export const contractsPath = '/contracts';
 
 export const merkleTreesPath = '/merkle-trees';
-export const newMerkleTreesPath = `${merkleTreesPath}/new`;
+export const newMerkleTreePath = `${merkleTreesPath}/new`;
 
 export const rolesBasePath = '/roles';
 export interface RolesParams {

@@ -10,7 +10,7 @@ import {
   deployPath,
   homePath,
   merkleTreesPath,
-  newMerkleTreesPath,
+  newMerkleTreePath,
   rolesBasePath,
 } from '../../routes/paths';
 
@@ -28,7 +28,7 @@ const AppNav = ({ disabled }: AppNavProps) => (
       <NavItem title="Deploy" icon={DeployIcon} path={deployPath} disabled={disabled} />
       <NavItem title="Contracts" icon={ContractIcon} path={contractsPath} disabled={disabled} />
       <NavItem title="Merkle Trees" icon={MerkleTreeIcon} path={merkleTreesPath} disabled={disabled} />
-      <NavItem title="New Merkle Tree" icon={MerkleTreeIcon} path={newMerkleTreesPath} child disabled={disabled} />
+      <NavItem title="New Merkle Tree" icon={MerkleTreeIcon} path={newMerkleTreePath} child disabled={disabled} />
       <NavItem title="Roles" icon={RoleIcon} path={`${rolesBasePath}/*`} disabled={disabled} hideInactive />
     </List>
   </ClippedDrawer>

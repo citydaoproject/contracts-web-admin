@@ -12,7 +12,7 @@ import {
   deployPath,
   homePath,
   merkleTreesPath,
-  newMerkleTreesPath,
+  newMerkleTreePath,
   parameterizedRolesPath,
 } from './paths';
 
@@ -22,7 +22,7 @@ const AppRoutes = () => (
     <Route path={deployPath} element={<DeployPage />} />
     <Route path={contractsPath} element={<ContractsPage />} />
     <Route path={merkleTreesPath} element={<MerkleTreesPage />} />
-    <Route path={newMerkleTreesPath} element={<AllowListMerkleTreePage />} />
+    <Route path={newMerkleTreePath} element={<AllowListMerkleTreePage />} />
     <Route path={parameterizedRolesPath} element={<RolesPage />} />
     <Route path="*" element={<BadRoute />} />
   </Routes>

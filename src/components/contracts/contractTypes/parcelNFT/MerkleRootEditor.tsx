@@ -3,6 +3,8 @@ import React from 'react';
 import { useFormFields } from '../../../../hooks/forms';
 import DefaultTextField from '../../../common/forms/DefaultTextField';
 import LoaderButton from '../../../common/forms/LoaderButton';
+import { newMerkleTreePath } from '../../../common/routes/paths';
+import RouteLink from '../../../common/routes/RouteLink';
 import DetailField from '../../../common/typography/DetailField';
 import DetailTitle from '../../../common/typography/DetailTitle';
 import DetailValue from '../../../common/typography/DetailValue';
@@ -53,6 +55,8 @@ const MerkleRootEditor = ({ parcelNFT, merkleRoot, onChange }: MerkleRootEditorP
       <LoaderButton loading={executing} onClick={handleSetMerkleRoot}>
         Update Merkle Root
       </LoaderButton>
+      <br />
+      See <RouteLink path={newMerkleTreePath}>New Merkle Tree</RouteLink> to create a new Merkle Tree.
     </DetailField>
   );
 };

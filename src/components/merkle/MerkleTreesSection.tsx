@@ -1,7 +1,7 @@
 import React from 'react';
 import { useRecoilValue } from 'recoil';
 import { allowListMerkleTreesSelector } from '../../data/merkleTrees';
-import { newMerkleTreesPath } from '../common/routes/paths';
+import { newMerkleTreePath } from '../common/routes/paths';
 import RouteButton from '../common/routes/RouteButton';
 import DetailField from '../common/typography/DetailField';
 import SectionTitle from '../common/typography/SectionTitle';
@@ -19,7 +19,7 @@ const MerkleTreesSection = ({}: MerkleTreesSectionProps) => {
         <AllowListMerkleTreeSection key={merkleTree.root} merkleTree={merkleTree} />
       ))}
       <DetailField>
-        <RouteButton path={newMerkleTreesPath}>New</RouteButton>
+        <RouteButton path={newMerkleTreePath}>New</RouteButton>
       </DetailField>
     </>
   );
