@@ -1,3 +1,4 @@
+import { useSnackbar } from 'notistack';
 import React from 'react';
 import { ParcelNFT } from '@citydao/parcel-contracts/dist/types/contracts';
 import { useFormFields } from '../../../../hooks/forms';
@@ -17,6 +18,8 @@ interface TokenURIFields {
 }
 
 const TokenURIEditor = ({ parcelNFT, onChange }: TokenURIEditorProps) => {
+  const { enqueueSnackbar } = useSnackbar();
+
   const { fields, handleFieldChange, resetFields } = useFormFields<TokenURIFields>({
     tokenId: '',
     newTokenURI: '',
@@ -34,6 +37,8 @@ const TokenURIEditor = ({ parcelNFT, onChange }: TokenURIEditorProps) => {
     if (onChange) {
       onChange(fields.tokenId, fields.newTokenURI);
     }
+
+    enqueueSnackbar('Token URI set successfully', { variant: 'success' });
   };
 
   return (

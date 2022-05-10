@@ -1,5 +1,6 @@
 import { TransactionRequest } from '@ethersproject/abstract-provider';
 import { ethers } from 'ethers';
+import { useSnackbar } from 'notistack';
 import React, { useMemo } from 'react';
 import { useFormFields } from '../../hooks/forms';
 import { isValidAddress } from '../../utils/constants';
@@ -31,6 +32,8 @@ const DeployContract = ({
   onDeployed,
   onClearContract,
 }: DeployContractProps) => {
+  const { enqueueSnackbar } = useSnackbar();
+
   const { execute, response, receipt, status, executing } = useExecuteTransaction(transactionRequest);
   const { fields, handleFieldChange, resetFields } = useFormFields<DeployContractFields>({
     address: '',
@@ -77,6 +80,8 @@ const DeployContract = ({
     if (onDeployed) {
       onDeployed(receipt.contractAddress);
     }
+
+    enqueueSnackbar('Contract deployed successfully', { variant: 'success' });
   };
 
   return (

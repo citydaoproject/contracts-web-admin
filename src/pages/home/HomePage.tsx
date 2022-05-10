@@ -26,7 +26,11 @@ export const HomePage = () => {
             Deploy the proxy contracts from the <strong>Deploy</strong> page.
           </li>
           <li>
-            Update contract settings fromt he <strong>Contracts</strong> page.
+            Click <strong>Edit Roles</strong> from the <strong>Contracts</strong> page to add accounts to the
+            appropriate roles.
+          </li>
+          <li>
+            Update contract settings from the <strong>Contracts</strong> page.
           </li>
           <li>
             If you need to generate a Merkle Root, go to the <strong>New Merkle Tree</strong> page and copy the Merkle

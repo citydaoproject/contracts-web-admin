@@ -1,3 +1,4 @@
+import { useSnackbar } from 'notistack';
 import React, { useMemo, useState } from 'react';
 import { WalletDetails } from '../../data/wallet';
 import DetailField from '../common/typography/DetailField';
@@ -17,6 +18,8 @@ export interface RolesSectionProps {
 }
 
 const RolesSection = ({ wallet, type, contractAddress }: RolesSectionProps) => {
+  const { enqueueSnackbar } = useSnackbar();
+
   const roles = useMemo(() => getLogicContractDefinition(type).roles, [wallet.address, type]);
   const [otherAddresses, setOtherAddresses] = useState<string[]>([]);
 
@@ -38,20 +41,20 @@ const RolesSection = ({ wallet, type, contractAddress }: RolesSectionProps) => {
     setOtherAddresses(otherAddresses.filter((a) => a !== otherAddress));
   };
 
-  const handleAddToRole = async (role: string, account: string) => {
+  const handleAddToRole = async (role: string, account: string, roleName: string) => {
     if (!(await addToRole(role, account))) {
       return;
     }
 
-    console.log(`Added ${account} to role:`, role);
+    enqueueSnackbar(`Successfully added ${account} to role ${roleName}`, { variant: 'success' });
   };
 
-  const handleRemoveFromRole = async (role: string, account: string) => {
+  const handleRemoveFromRole = async (role: string, account: string, roleName: string) => {
     if (!(await removeFromRole(role, account))) {
       return;
     }
 
-    console.log(`Removed ${account} from role:`, role);
+    enqueueSnackbar(`Successfully removed ${account} from role ${roleName}`, { variant: 'success' });
   };
 
   return (
@@ -74,8 +77,8 @@ const RolesSection = ({ wallet, type, contractAddress }: RolesSectionProps) => {
           role={role}
           details={roleDetails[role.id] || null}
           executing={loading || executing}
-          onAddToRole={(address) => handleAddToRole(role.id, address)}
-          onRemoveFromRole={(address) => handleRemoveFromRole(role.id, address)}
+          onAddToRole={(address) => handleAddToRole(role.id, address, role.name)}
+          onRemoveFromRole={(address) => handleRemoveFromRole(role.id, address, role.name)}
         />
       ))}
     </>

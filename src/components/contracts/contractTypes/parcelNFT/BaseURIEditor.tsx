@@ -1,4 +1,5 @@
 import { ParcelNFT } from '@citydao/parcel-contracts/dist/types/contracts/ParcelNFT';
+import { useSnackbar } from 'notistack';
 import React from 'react';
 import { useFormFields } from '../../../../hooks/forms';
 import DefaultTextField from '../../../common/forms/DefaultTextField';
@@ -19,6 +20,8 @@ interface BaseURIFields {
 }
 
 const BaseURIEditor = ({ parcelNFT, baseURI, onChange }: BaseURIEditorProps) => {
+  const { enqueueSnackbar } = useSnackbar();
+
   const { fields, handleFieldChange, resetFields } = useFormFields<BaseURIFields>({
     baseURI: '',
   });
@@ -35,6 +38,8 @@ const BaseURIEditor = ({ parcelNFT, baseURI, onChange }: BaseURIEditorProps) => 
     if (onChange) {
       onChange(fields.baseURI);
     }
+
+    enqueueSnackbar('Base URI set successfully', { variant: 'success' });
   };
 
   return (

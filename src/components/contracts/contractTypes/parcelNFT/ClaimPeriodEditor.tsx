@@ -1,6 +1,7 @@
 import { ParcelNFT } from '@citydao/parcel-contracts/dist/types/contracts/ParcelNFT';
 import { BigNumber } from 'ethers';
 import { DateTime } from 'luxon';
+import { useSnackbar } from 'notistack';
 import React from 'react';
 import { convertToClaimPeriodTimestamp } from '@citydao/parcel-contracts/src/contracts/AllowListClaim';
 import { ParcelNFT__factory } from '@citydao//parcel-contracts/types/contracts';
@@ -24,6 +25,8 @@ interface ClaimPeriodFields {
 }
 
 const ClaimPeriodEditor = ({ parcelNFT, onChange }: ClaimPeriodEditorProps) => {
+  const { enqueueSnackbar } = useSnackbar();
+
   const { fields, handleFieldChange, resetFields } = useFormFields<ClaimPeriodFields>({
     claimPeriodStart: '',
     claimPeriodEnd: '',
@@ -55,6 +58,8 @@ const ClaimPeriodEditor = ({ parcelNFT, onChange }: ClaimPeriodEditorProps) => {
     if (onChange) {
       onChange(fields.claimPeriodStart, fields.claimPeriodEnd);
     }
+
+    enqueueSnackbar('Claim Period set successfully', { variant: 'success' });
 
     await refetch();
   };

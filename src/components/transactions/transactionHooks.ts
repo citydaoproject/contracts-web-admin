@@ -1,5 +1,6 @@
 import { TransactionReceipt, TransactionRequest, TransactionResponse } from '@ethersproject/abstract-provider';
 import { useEffect, useState } from 'react';
+import { useErrors } from '../../hooks/errors';
 import {
   executeTransaction,
   getTransactionReceipt,
@@ -56,12 +57,15 @@ export interface ExecuteTransactionHook extends FetchTransactionHook {
 }
 
 export const useExecuteTransaction = (transactionRequest?: TransactionRequest): ExecuteTransactionHook => {
+  const { showError, clearError } = useErrors();
+
   const [response, setResponse] = useState<TransactionResponse | null>(null);
   const [receipt, setReceipt] = useState<TransactionReceipt | null>(null);
   const [status, setStatus] = useState<TransactionStatus>(TransactionStatus.Pending);
   const [executing, setExecuting] = useState(false);
 
   const execute = async (overrideTransactionRequest?: TransactionRequest) => {
+    clearError();
     setExecuting(true);
 
     const request = overrideTransactionRequest || transactionRequest;
@@ -82,6 +86,9 @@ export const useExecuteTransaction = (transactionRequest?: TransactionRequest): 
       await repeatUntil(() => fetchTransactionReceipt(response.hash));
 
       return getTransactionReceipt(response.hash);
+    } catch (error) {
+      showError(error);
+      return null;
     } finally {
       setExecuting(false);
     }

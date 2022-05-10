@@ -1,4 +1,5 @@
 import { ParcelNFT } from '@citydao/parcel-contracts/dist/types/contracts/ParcelNFT';
+import { useSnackbar } from 'notistack';
 import React from 'react';
 import { useFormFields } from '../../../../hooks/forms';
 import { isValidAddress } from '../../../../utils/constants';
@@ -22,6 +23,8 @@ interface TokenRoyaltyFields {
 }
 
 const TokenRoyaltyEditor = ({ parcelNFT, onChange }: TokenRoyaltyEditorProps) => {
+  const { enqueueSnackbar } = useSnackbar();
+
   const { fields, handleFieldChange, resetFields } = useFormFields<TokenRoyaltyFields>({
     tokenId: '',
     receiver: '',
@@ -50,6 +53,8 @@ const TokenRoyaltyEditor = ({ parcelNFT, onChange }: TokenRoyaltyEditorProps) =>
     if (onChange) {
       onChange(fields.receiver, feeNumerator);
     }
+
+    enqueueSnackbar('Token Royalty set successfully', { variant: 'success' });
   };
 
   return (

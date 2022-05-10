@@ -1,4 +1,5 @@
 import { ParcelNFT } from '@citydao/parcel-contracts/dist/types/contracts/ParcelNFT';
+import { useSnackbar } from 'notistack';
 import React from 'react';
 import { useFormFields } from '../../../../hooks/forms';
 import DefaultTextField from '../../../common/forms/DefaultTextField';
@@ -21,6 +22,8 @@ interface MerkleRootFields {
 }
 
 const MerkleRootEditor = ({ parcelNFT, merkleRoot, onChange }: MerkleRootEditorProps) => {
+  const { enqueueSnackbar } = useSnackbar();
+
   const { fields, handleFieldChange, resetFields } = useFormFields<MerkleRootFields>({
     merkleRoot: '',
   });
@@ -37,6 +40,8 @@ const MerkleRootEditor = ({ parcelNFT, merkleRoot, onChange }: MerkleRootEditorP
     if (onChange) {
       onChange(fields.merkleRoot);
     }
+
+    enqueueSnackbar('Merkle Root set successfully', { variant: 'success' });
   };
 
   return (
