@@ -9,6 +9,7 @@ import SubSectionTitle from '../common/typography/SubSectionTitle';
 import ContractLink from './ContractLink';
 import ContractFieldsPicker from './contractTypes/ContractFieldsPicker';
 import { getLogicContractDefinition } from './logicContracts';
+import UpgradeContract from './UpgradeContract';
 
 export interface ProxyContractSectionProps {
   proxyContractInfo: ProxyContractInfo;
@@ -29,6 +30,7 @@ const ProxyContractSection = ({ proxyContractInfo }: ProxyContractSectionProps) 
     <>
       <SubSectionTitle>{proxyContractInfo.type} Proxy</SubSectionTitle>
       <ContractFieldsPicker type={proxyContractInfo.type} address={proxyContractInfo.address} />
+      <UpgradeContract proxyContractAddress={proxyContractInfo.address} />
       <DetailField>
         <DetailTitle>Address</DetailTitle>
         <ContractLink address={proxyContractInfo.address} />
