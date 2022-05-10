@@ -1,8 +1,8 @@
-import { EthereumAddress } from '@citydao/parcel-contracts/src/constants/accounts';
+import { EthereumAddress } from '@citydao/parcel-contracts/dist/src/constants/accounts';
 import {
   AllowListByAddress,
   buildMerkleTreeForAllowList,
-} from '@citydao/parcel-contracts/src/contracts/AllowListClaim';
+} from '@citydao/parcel-contracts/dist/src/contracts/AllowListClaim';
 import { BigNumberish } from 'ethers';
 import React, { useState } from 'react';
 import { AllowListMerkleTreeDetails } from '../../data/merkleTrees';

@@ -1,5 +1,5 @@
-import { EthereumAddress } from '@citydao/parcel-contracts/src/constants/accounts';
-import { AllowListByAddress } from '@citydao/parcel-contracts/src/contracts/AllowListClaim';
+import { EthereumAddress } from '@citydao/parcel-contracts/dist/src/constants/accounts';
+import { AllowListByAddress } from '@citydao/parcel-contracts/dist/src/contracts/AllowListClaim';
 import { css } from '@emotion/react';
 import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';

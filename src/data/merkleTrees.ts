@@ -1,5 +1,5 @@
 import { atom, DefaultValue, selector } from 'recoil';
-import { AllowListByAddress } from '../../../parcel-contracts/src/contracts/AllowListClaim';
+import { AllowListByAddress } from '@citydao/parcel-contracts/dist/src/contracts/AllowListClaim';
 import { getLocalStorage, removeLocalStorage, setLocalStorage } from '../utils/localStorage';
 
 export interface AllowListMerkleTreeDetails {
