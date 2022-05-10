@@ -2,6 +2,7 @@ import { useTheme } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
 import React from 'react';
 import { useWallet } from '../../hooks/wallet';
+import CopyToClipboard from '../common/actions/CopyToClipboard';
 import BigNumberFormat from '../common/typography/BigNumberFormat';
 
 const WalletBalance = () => {
@@ -18,7 +19,7 @@ const WalletBalance = () => {
 
   return (
     <Typography variant="subtitle1" style={{ marginLeft: margin, marginRight: margin }}>
-      Wallet {address}:{' '}
+      Wallet {address} <CopyToClipboard text={address} />:{' '}
       <BigNumberFormat
         displayType="text"
         automaticDecimalScale

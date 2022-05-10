@@ -5,6 +5,7 @@ import AccordionSummary from '@mui/material/AccordionSummary';
 import { BigNumber } from 'ethers';
 import React from 'react';
 import { AllowListMerkleTreeDetails } from '../../data/merkleTrees';
+import CopyToClipboard from '../common/actions/CopyToClipboard';
 import ExpandIcon from '../common/actions/ExpandIcon';
 import DetailField from '../common/typography/DetailField';
 import DetailTitle from '../common/typography/DetailTitle';
@@ -25,7 +26,11 @@ const AllowListMerkleTreeSection = ({ merkleTree }: AllowListMerkleTreeSectionPr
     <AccordionDetails>
       <DetailField>
         <DetailTitle>Merkle Root</DetailTitle>
-        <DetailValue>{merkleTree.root}</DetailValue>
+        <DetailValue>
+          <>
+            {merkleTree.root} <CopyToClipboard text={merkleTree.root} />
+          </>
+        </DetailValue>
       </DetailField>
 
       <AllowListMerkleTreeAllowances allowList={merkleTree.allowList} />
