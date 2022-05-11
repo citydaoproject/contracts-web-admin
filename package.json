@@ -23,7 +23,7 @@
     "test": "jest",
     "test:integration": "npm run pretest && jasmine --config=spec/support/jasmine-integration.json",
     "posttest": "npm run lint",
-    "lint": "eslint",
+    "lint": "eslint && tsc --noEmit",
     "pretty": "pretty-quick",
     "server:development": "webpack-cli serve --mode development",
     "deploy": "serverless deploy --verbose --stage test && serverless client deploy --no-confirm --no-delete-contents --stage test",
