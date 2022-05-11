@@ -1,5 +1,5 @@
 import React from 'react';
-import PageContainer from '../../components/common/page/PageContainer';
+import WidePageContainer from '../../components/common/page/WidePageContainer';
 import DeployedContractsSection from '../../components/contracts/DeployedContractsSection';
 import ConnectWalletPage from '../../components/wallet/ConnectWalletPage';
 import { usePageTitle } from '../../hooks/page';
@@ -14,9 +14,9 @@ const ContractsPage = () => {
   }
 
   return (
-    <PageContainer>
+    <WidePageContainer>
       <DeployedContractsSection />
-    </PageContainer>
+    </WidePageContainer>
   );
 };
 export default ContractsPage;

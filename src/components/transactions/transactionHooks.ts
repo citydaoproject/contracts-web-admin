@@ -66,7 +66,6 @@ export const useExecuteTransaction = (transactionRequest?: TransactionRequest): 
 
   const execute = async (overrideTransactionRequest?: TransactionRequest) => {
     clearError();
-    setExecuting(true);
 
     const request = overrideTransactionRequest || transactionRequest;
     if (!request) {
@@ -74,6 +73,7 @@ export const useExecuteTransaction = (transactionRequest?: TransactionRequest): 
       return null;
     }
 
+    setExecuting(true);
     try {
       const response = await executeTransaction(request);
       setResponse(response);
