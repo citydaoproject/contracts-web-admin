@@ -13,7 +13,7 @@ provider:
 custom:
   stage: ${opt:stage, self:provider.stage}
   client:
-    bucketName: ${self:service.name}-${self:custom.stage}
+    bucketName: ${self:custom.serviceName}-${self:custom.stage}
     distributionFolder: dist
     indexDocument: index.html
     errorDocument: index.html
@@ -30,12 +30,13 @@ custom:
   domainName: ${self:custom.domainNameStage.${self:custom.stage}}
   domainNameStage:
     test: test.${self:custom.baseDomainName}
-    prod: www.${self:custom.baseDomainName}
-  baseDomainName: ${custom.hostedZone}
-  hostedZone: citydao.com
+    prod: ${self:custom.baseDomainName}
+  baseDomainName: contracts-admin.citydao.${self:custom.hostedZone}
+  hostedZone: mdnatx.name
   logs:
-    bucket: citydao-logs
-    path: websites/${self:service.name}/${self:custom.stage}/cloudfront
+    bucket: mdnatx-logs
+    path: websites/${self:service}/${self:custom.stage}/cloudfront
+  serviceName: citydao-${self:service}
 
 resources:
   Resources:
@@ -50,7 +51,7 @@ resources:
       Type: AWS::CloudFront::CloudFrontOriginAccessIdentity
       Properties:
         CloudFrontOriginAccessIdentityConfig:
-          Comment: ${self:service.name}-${self:custom.stage}-oai
+          Comment: ${self:custom.serviceName}-${self:custom.stage}-oai
 
     WebAppS3BucketPolicy:
       Type: AWS::S3::BucketPolicy

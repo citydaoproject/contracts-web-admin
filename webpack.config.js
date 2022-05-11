@@ -1,14 +1,20 @@
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
+const webpack = require('webpack');
 
-const WEBPACK_SERVER_PORT = process.env.WEBPACK_SERVER_PORT || 5000;
+const WEBPACK_SERVER_PORT = process.env.WEBPACK_SERVER_PORT || 5001;
 
 const webpackConfig = (env, argv) => {
   const { mode } = argv;
   const production = mode === 'production';
   const development = !production;
   const analyze = false;
-  const plugins = [new HtmlWebpackPlugin({ template: 'src/index.html.ejs' })];
+  const plugins = [
+    new HtmlWebpackPlugin({ template: 'src/index.html.ejs' }),
+    new webpack.ProvidePlugin({
+      Buffer: ['buffer', 'Buffer'],
+    }),
+  ];
 
   if (analyze) {
     plugins.push(
@@ -84,9 +90,11 @@ const webpackConfig = (env, argv) => {
             'sass-loader?sourceMap',
           ],
         },
-        { test: /\.(png|woff|woff2|eot|ttf|svg)$/, loader: 'url-loader' },
+        { test: /\.svg$/, use: ['@svgr/webpack'] },
+        { test: /\.(png|woff|woff2|eot|ttf)$/, loader: 'url-loader' },
       ],
     },
+    ignoreWarnings: [/Failed to parse source map/],
   };
 };
 
