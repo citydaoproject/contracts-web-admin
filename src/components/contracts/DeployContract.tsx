@@ -1,3 +1,4 @@
+import { ContractAddress } from '@citydao/parcel-contracts/dist/src/constants/accounts';
 import { TransactionRequest } from '@ethersproject/abstract-provider';
 import { ethers } from 'ethers';
 import { useSnackbar } from 'notistack';
@@ -15,10 +16,11 @@ import ContractLink from './ContractLink';
 
 export interface DeployContractProps {
   transactionRequest: TransactionRequest;
-  existingContractAddress?: string | null;
+  buildAfterDeployTransactionRequest?: (address: ContractAddress) => Promise<TransactionRequest>;
+  existingContractAddress?: ContractAddress | null;
   onBeforeDeploy?: () => void;
-  onDeployed?: (address: string) => void;
-  onClearContract?: (previousAddress: string) => void;
+  onDeployed?: (address: ContractAddress) => void;
+  onClearContract?: (previousAddress: ContractAddress) => void;
 }
 
 interface DeployContractFields {
@@ -27,6 +29,7 @@ interface DeployContractFields {
 
 const DeployContract = ({
   transactionRequest,
+  buildAfterDeployTransactionRequest,
   existingContractAddress,
   onBeforeDeploy,
   onDeployed,
@@ -34,7 +37,21 @@ const DeployContract = ({
 }: DeployContractProps) => {
   const { enqueueSnackbar } = useSnackbar();
 
-  const { execute, response, receipt, status, executing } = useExecuteTransaction(transactionRequest);
+  const {
+    execute: executeDeployment,
+    response: deploymentResponse,
+    receipt: deploymentReceipt,
+    status: deploymentStatus,
+    executing: executingDeployment,
+  } = useExecuteTransaction(transactionRequest);
+
+  const {
+    execute: executeInitialization,
+    response: initializationResponse,
+    status: initializationStatus,
+    executing: executingInitialization,
+  } = useExecuteTransaction();
+
   const { fields, handleFieldChange, resetFields } = useFormFields<DeployContractFields>({
     address: '',
   });
@@ -44,27 +61,28 @@ const DeployContract = ({
       return existingContractAddress;
     }
 
-    if (receipt) {
-      return receipt.contractAddress;
+    if (deploymentReceipt) {
+      return deploymentReceipt.contractAddress;
     }
 
     return null;
-  }, [existingContractAddress, response?.hash, receipt]);
+  }, [existingContractAddress, deploymentResponse?.hash, deploymentReceipt]);
 
   const formValid = fields.address && isValidAddress(fields.address);
 
   const handleSetAddress = () => {
-    if (!onDeployed) {
-      return;
-    }
-
     const address = fields.address;
     if (!address) {
       return;
     }
 
-    onDeployed(ethers.utils.getAddress(address));
     resetFields();
+
+    if (!onDeployed) {
+      return;
+    }
+
+    onDeployed(ethers.utils.getAddress(address));
   };
 
   const handleDeploy = async () => {
@@ -72,9 +90,13 @@ const DeployContract = ({
       onBeforeDeploy();
     }
 
-    const receipt = await execute();
+    const receipt = await executeDeployment();
     if (!receipt) {
       return;
+    }
+
+    if (buildAfterDeployTransactionRequest) {
+      await executeInitialization(await buildAfterDeployTransactionRequest(receipt.contractAddress));
     }
 
     if (onDeployed) {
@@ -106,18 +128,30 @@ const DeployContract = ({
           </DefaultButton>
         </DetailField>
       ) : null}
-      {response ? (
+
+      {deploymentResponse ? (
         <DetailField>
-          <DetailTitle>Transaction</DetailTitle>
-          <TransactionLink transactionHash={response.hash} transactionStatus={status} />
+          <DetailTitle>Deployment Transaction</DetailTitle>
+          <TransactionLink transactionHash={deploymentResponse.hash} transactionStatus={deploymentStatus} />
         </DetailField>
       ) : null}
+
+      {initializationResponse ? (
+        <DetailField>
+          <DetailTitle>Initialization Transaction</DetailTitle>
+          <TransactionLink transactionHash={initializationResponse.hash} transactionStatus={initializationStatus} />
+        </DetailField>
+      ) : null}
+
       <DetailField>
-        <LoaderButton loading={executing} onClick={handleDeploy}>
+        <LoaderButton loading={executingDeployment || executingInitialization} onClick={handleDeploy}>
           {address ? 'Redeploy Contract' : 'Deploy Contract'}
         </LoaderButton>{' '}
         {address && onClearContract ? (
-          <DefaultButton disabled={executing} onClick={() => onClearContract(address)}>
+          <DefaultButton
+            disabled={executingDeployment || executingInitialization}
+            onClick={() => onClearContract(address)}
+          >
             Clear Contract
           </DefaultButton>
         ) : null}
