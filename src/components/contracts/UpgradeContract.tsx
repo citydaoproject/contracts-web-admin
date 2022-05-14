@@ -1,9 +1,10 @@
 import { toEthereumAddress } from '@citydao/parcel-contracts/dist/src/constants/accounts';
 import { UUPSUpgradeable__factory } from '@citydao/parcel-contracts/dist/types/contracts/factories/UUPSUpgradeable__factory';
+import { UUPSUpgradeable } from '@citydao/parcel-contracts/dist/types/contracts/UUPSUpgradeable';
 import { Provider } from '@ethersproject/providers';
 import { BigNumber, Contract } from 'ethers';
 import { useSnackbar } from 'notistack';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useFormFields } from '../../hooks/forms';
 import { getStorageLocationFromText, readStorageValue } from '../../utils/contractStorage';
 import DefaultTextField from '../common/forms/DefaultTextField';
@@ -27,37 +28,32 @@ interface UpgradeContractFields {
 const UpgradeContract = ({ proxyContractAddress, onUpgrade }: UpgradeContractProps) => {
   const { enqueueSnackbar } = useSnackbar();
 
-  const { provider } = useEthereumProvider();
-
-  const { contract: proxyContract } = useInterfaceLoader(UUPSUpgradeable__factory.connect, proxyContractAddress);
-
-  const { fields, handleFieldChange, resetFields } = useFormFields<UpgradeContractFields>({
-    logicContractAddress: '',
-  });
-
   const [logicContractAddress, setContractLogicAddress] = useState<string>();
 
-  const { execute, executing } = useExecuteTransaction();
+  const { provider } = useEthereumProvider();
 
-  useEffect(() => {
-    // noinspection JSIgnoredPromiseFromCall
-    fetchLogicContractAddress();
-  }, [proxyContractAddress]);
-
-  const fetchLogicContractAddress = async () => {
+  const fetchProxyContractData = async (proxyContract: UUPSUpgradeable) => {
     if (!provider) {
       console.warn('No provider found');
-      return;
-    }
-
-    if (!proxyContract) {
-      console.warn('No proxy contract found');
       return;
     }
 
     const logicContractAddress = await getProxyImplementationAddress(proxyContract, provider);
     setContractLogicAddress(logicContractAddress);
   };
+
+  const { contract: proxyContract } = useInterfaceLoader(
+    UUPSUpgradeable__factory.connect,
+    proxyContractAddress,
+    [],
+    fetchProxyContractData,
+  );
+
+  const { fields, handleFieldChange, resetFields } = useFormFields<UpgradeContractFields>({
+    logicContractAddress: '',
+  });
+
+  const { execute, executing } = useExecuteTransaction();
 
   const handleUpgradeContract = async () => {
     if (!proxyContract) {

@@ -1,9 +1,13 @@
 import { ContractAddress } from '@citydao/parcel-contracts/dist/src/constants/accounts';
+import { SUPER_ADMIN_ROLE } from '@citydao/parcel-contracts/dist/src/constants/roles';
+import { AccessControlUpgradeable } from '@citydao/parcel-contracts/dist/types/contracts/AccessControlUpgradeable';
+import { AccessControlUpgradeable__factory } from '@citydao/parcel-contracts/dist/types/contracts/factories/AccessControlUpgradeable__factory';
 import { TransactionRequest } from '@ethersproject/abstract-provider';
 import { ethers } from 'ethers';
 import { useSnackbar } from 'notistack';
 import React, { useMemo } from 'react';
 import { useFormFields } from '../../hooks/forms';
+import { useWallet } from '../../hooks/wallet';
 import { isValidAddress } from '../../utils/constants';
 import DefaultButton from '../common/forms/DefaultButton';
 import DefaultTextField from '../common/forms/DefaultTextField';
@@ -12,6 +16,7 @@ import DetailField from '../common/typography/DetailField';
 import DetailTitle from '../common/typography/DetailTitle';
 import { useExecuteTransaction } from '../transactions/transactionHooks';
 import TransactionLink from '../transactions/TransactionLink';
+import { useInterfaceLoader } from './contractHooks';
 import ContractLink from './ContractLink';
 
 export interface DeployContractProps {
@@ -37,6 +42,8 @@ const DeployContract = ({
 }: DeployContractProps) => {
   const { enqueueSnackbar } = useSnackbar();
 
+  const { wallet } = useWallet();
+
   const {
     execute: executeDeployment,
     response: deploymentResponse,
@@ -56,6 +63,17 @@ const DeployContract = ({
     address: '',
   });
 
+  const [initialized, setInitialized] = React.useState(true);
+
+  const onFetch = async (contract: AccessControlUpgradeable) => {
+    if (!wallet) {
+      console.debug('No wallet...');
+      return;
+    }
+
+    setInitialized(await contract.hasRole(SUPER_ADMIN_ROLE, wallet.address));
+  };
+
   const address = useMemo(() => {
     if (existingContractAddress) {
       return existingContractAddress;
@@ -67,6 +85,8 @@ const DeployContract = ({
 
     return null;
   }, [existingContractAddress, deploymentResponse?.hash, deploymentReceipt]);
+
+  const { refetch } = useInterfaceLoader(AccessControlUpgradeable__factory.connect, address, [], onFetch);
 
   const formValid = fields.address && isValidAddress(fields.address);
 
@@ -95,15 +115,24 @@ const DeployContract = ({
       return;
     }
 
-    if (buildAfterDeployTransactionRequest) {
-      await executeInitialization(await buildAfterDeployTransactionRequest(receipt.contractAddress));
-    }
+    const contractAddress = receipt.contractAddress;
+    await executeAfterDeploy(contractAddress);
 
     if (onDeployed) {
-      onDeployed(receipt.contractAddress);
+      onDeployed(contractAddress);
     }
 
     enqueueSnackbar('Contract deployed successfully', { variant: 'success' });
+  };
+
+  const executeAfterDeploy = async (contractAddress: string) => {
+    if (!buildAfterDeployTransactionRequest) {
+      return;
+    }
+
+    await executeInitialization(await buildAfterDeployTransactionRequest(contractAddress));
+
+    refetch();
   };
 
   return (
@@ -154,6 +183,14 @@ const DeployContract = ({
           >
             Clear Contract
           </DefaultButton>
+        ) : null}
+        {address && !initialized && buildAfterDeployTransactionRequest ? (
+          <LoaderButton
+            disabled={executingDeployment || executingInitialization}
+            onClick={() => executeAfterDeploy(address)}
+          >
+            Initialize Contract
+          </LoaderButton>
         ) : null}
       </DetailField>
     </>
