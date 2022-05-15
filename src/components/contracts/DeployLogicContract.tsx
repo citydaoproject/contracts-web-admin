@@ -3,6 +3,7 @@ import { getNetworkLogicContractSelector } from '../../data/logicContracts';
 import { WalletDetails } from '../../data/wallet';
 import SubSectionTitle from '../common/typography/SubSectionTitle';
 import DeployProxyContractPicker from './contractTypes/DeployProxyContractPicker';
+import { getInitializationFunctionBuilder } from './contractTypes/initializationFunctionPicker';
 import DeployContract from './DeployContract';
 import { LogicContractDefinition } from './logicContracts';
 
@@ -31,6 +32,7 @@ const DeployLogicContract = ({ logicContractDefinition, wallet }: DeployLogicCon
       <SubSectionTitle>{logicContractDefinition.type} Logic</SubSectionTitle>
       <DeployContract
         transactionRequest={logicContractDefinition.factory().getDeployTransaction()}
+        buildAfterDeployTransactionRequest={getInitializationFunctionBuilder(logicContractDefinition.type)}
         existingContractAddress={logicContract?.address}
         onBeforeDeploy={() => setLogicContract(null)}
         onDeployed={handleDeployed}

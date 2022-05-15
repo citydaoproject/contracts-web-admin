@@ -1,3 +1,4 @@
+import { ContractAddress } from '@citydao/parcel-contracts/dist/src/constants/accounts';
 import { Provider } from '@ethersproject/providers';
 import { Contract, ContractFactory, Signer } from 'ethers';
 import { useEffect, useMemo, useState } from 'react';
@@ -32,26 +33,26 @@ export const useContractLoader = <
   K extends KeyOfGetterFunction<C>,
 >(
   factory: F,
-  address: string,
+  address: ContractAddress | null,
   keys: K[] = [],
+  onFetch?: (contract: C) => Promise<any>,
 ): ContractLoaderHook<C, K> => {
   const { wallet } = useWallet();
 
-  const contract = useMemo(() => attachContract<F, C>(factory, address), [address, wallet]);
+  const contract = useMemo(() => attachContract<F, C>(factory, address) || undefined, [address, wallet]);
   const [values, setValues] = useState<ContractValues<C, K>>();
 
   useEffect(() => {
     // noinspection JSIgnoredPromiseFromCall
     fetchValues();
-  }, [contract]);
+  }, [contract, address]);
 
   const fetchValues = async () => {
-    if (!contract) {
+    if (!contract || !address) {
       setValues(undefined);
       return;
     }
-
-    const fetchedValues = await Promise.all(keys.map((key) => contract[key]()));
+    const [fetchedValues] = await Promise.all([Promise.all(keys.map((key) => contract[key]())), onFetch?.(contract)]);
 
     setValues(
       fetchedValues.reduce((acc, fetchedValue, index) => {
@@ -66,26 +67,27 @@ export const useContractLoader = <
 
 export const useInterfaceLoader = <C extends Contract, K extends KeyOfGetterFunction<C>>(
   factory: InterfaceFactoryConnector<C>,
-  address: string,
+  address: ContractAddress | null,
   keys: K[] = [],
+  onFetch?: (contract: C) => Promise<any>,
 ): ContractLoaderHook<C, K> => {
   const { wallet } = useWallet();
 
-  const contract = useMemo(() => attachInterface<C>(factory, address) || undefined, [address, wallet]);
+  const contract = useMemo(() => attachInterface<C>(factory, address || '') || undefined, [address, wallet]);
   const [values, setValues] = useState<ContractValues<C, K>>();
 
   useEffect(() => {
     // noinspection JSIgnoredPromiseFromCall
     fetchValues();
-  }, [contract]);
+  }, [contract, address]);
 
   const fetchValues = async () => {
-    if (!contract) {
+    if (!contract || !address) {
       setValues(undefined);
       return;
     }
 
-    const fetchedValues = await Promise.all(keys.map((key) => contract[key]()));
+    const [fetchedValues] = await Promise.all([Promise.all(keys.map((key) => contract[key]())), onFetch?.(contract)]);
 
     setValues(
       fetchedValues.reduce((acc, fetchedValue, index) => {
