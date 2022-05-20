@@ -20,8 +20,10 @@ export const useErrors = (defaultOptions?: OptionsObject): ErrorsHook => {
 
   return {
     showError: (error: Error, options?: OptionsObject): ErrorKey => {
-      console.error('Error:', error);
-      const newErrorKey = enqueueSnackbar(limitLength(error.message, 200), {
+      const errorMessage = extractErrorMessage(error);
+      console.error('Error: ', errorMessage);
+      console.error(error);
+      const newErrorKey = enqueueSnackbar(limitLength(errorMessage, 200), {
         ...standardOptions,
         ...defaultOptions,
         ...options,
@@ -49,3 +51,11 @@ export const useErrors = (defaultOptions?: OptionsObject): ErrorsHook => {
 export interface HasErrorHandler {
   onError?: (error: Error) => void;
 }
+
+export const extractErrorMessage = (error: Error): string => {
+  if ('error' in error && 'message' in error['error']) {
+    return error['error']['message'];
+  }
+
+  return error.message;
+};

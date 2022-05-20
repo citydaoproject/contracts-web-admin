@@ -1,12 +1,14 @@
-import { toEthereumAddress } from '@citydao/parcel-contracts/dist/src/constants/accounts';
+import { encodeTransferOwnershipFunction } from '@citydao/parcel-contracts/dist/src/contracts/ownable';
+import { getProxyImplementationAddress } from '@citydao/parcel-contracts/dist/src/contracts/upgradeableProxy';
+import { ERC1967Proxy__factory } from '@citydao/parcel-contracts/dist/types/contracts/factories/ERC1967Proxy__factory';
 import { UUPSUpgradeable__factory } from '@citydao/parcel-contracts/dist/types/contracts/factories/UUPSUpgradeable__factory';
 import { UUPSUpgradeable } from '@citydao/parcel-contracts/dist/types/contracts/UUPSUpgradeable';
-import { Provider } from '@ethersproject/providers';
-import { BigNumber, Contract } from 'ethers';
+import { TransactionReceipt } from '@ethersproject/abstract-provider';
 import { useSnackbar } from 'notistack';
 import React, { useState } from 'react';
+import { useRecoilValue } from 'recoil';
+import { getNetworkLogicContractSelector } from '../../data/logicContracts';
 import { useFormFields } from '../../hooks/forms';
-import { getStorageLocationFromText, readStorageValue } from '../../utils/contractStorage';
 import DefaultTextField from '../common/forms/DefaultTextField';
 import LoaderButton from '../common/forms/LoaderButton';
 import DetailField from '../common/typography/DetailField';
@@ -15,22 +17,28 @@ import DetailValue from '../common/typography/DetailValue';
 import { useExecuteTransaction } from '../transactions/transactionHooks';
 import { useEthereumProvider, useInterfaceLoader } from './contractHooks';
 import ContractLink from './ContractLink';
+import { LogicContractType } from './logicContracts';
 
 export interface UpgradeContractProps {
   proxyContractAddress: string;
+  type: LogicContractType;
   onUpgrade?: (logicContractAddress: string) => void;
 }
 
 interface UpgradeContractFields {
   logicContractAddress: string;
+  newOwner: string;
 }
 
-const UpgradeContract = ({ proxyContractAddress, onUpgrade }: UpgradeContractProps) => {
+const UpgradeContract = ({ proxyContractAddress, type, onUpgrade }: UpgradeContractProps) => {
   const { enqueueSnackbar } = useSnackbar();
 
   const [logicContractAddress, setContractLogicAddress] = useState<string>();
 
   const { provider } = useEthereumProvider();
+
+  const latestLogicContractValue = useRecoilValue(getNetworkLogicContractSelector(type));
+  const latestLogicContractAddress = latestLogicContractValue?.address || '';
 
   const fetchProxyContractData = async (proxyContract: UUPSUpgradeable) => {
     if (!provider) {
@@ -38,19 +46,22 @@ const UpgradeContract = ({ proxyContractAddress, onUpgrade }: UpgradeContractPro
       return;
     }
 
-    const logicContractAddress = await getProxyImplementationAddress(proxyContract, provider);
+    const logicContractAddress = await getProxyImplementationAddress(
+      ERC1967Proxy__factory.connect(proxyContract.address, proxyContract.provider),
+    );
     setContractLogicAddress(logicContractAddress);
   };
 
-  const { contract: proxyContract } = useInterfaceLoader(
+  const { contract: proxyContract, refetch } = useInterfaceLoader(
     UUPSUpgradeable__factory.connect,
     proxyContractAddress,
     [],
     fetchProxyContractData,
   );
 
-  const { fields, handleFieldChange, resetFields } = useFormFields<UpgradeContractFields>({
+  const { fields, handleFieldChange, setFieldValue, resetFields } = useFormFields<UpgradeContractFields>({
     logicContractAddress: '',
+    newOwner: '',
   });
 
   const { execute, executing } = useExecuteTransaction();
@@ -61,9 +72,11 @@ const UpgradeContract = ({ proxyContractAddress, onUpgrade }: UpgradeContractPro
       return;
     }
 
-    if (!(await execute(await proxyContract.populateTransaction.upgradeTo(fields.logicContractAddress)))) {
+    if (!(await upgradeProxy())) {
       return;
     }
+
+    await refetch();
 
     resetFields();
 
@@ -72,6 +85,28 @@ const UpgradeContract = ({ proxyContractAddress, onUpgrade }: UpgradeContractPro
     }
 
     enqueueSnackbar('Upgraded contract successfully', { variant: 'success' });
+  };
+
+  const handleUseLatestLogicContractDefinition = () => {
+    setFieldValue('logicContractAddress', latestLogicContractAddress);
+  };
+
+  const upgradeProxy = async (): Promise<TransactionReceipt | null> => {
+    if (!proxyContract) {
+      console.warn('No proxy contract found');
+      return null;
+    }
+
+    if (fields.newOwner) {
+      return execute(
+        await proxyContract.populateTransaction.upgradeToAndCall(
+          fields.logicContractAddress,
+          encodeTransferOwnershipFunction(fields.newOwner),
+        ),
+      );
+    }
+
+    return execute(await proxyContract.populateTransaction.upgradeTo(fields.logicContractAddress));
   };
 
   if (!proxyContract || !logicContractAddress) {
@@ -93,6 +128,20 @@ const UpgradeContract = ({ proxyContractAddress, onUpgrade }: UpgradeContractPro
         required
         onChange={handleFieldChange}
       />
+      <DefaultTextField
+        name="newOwner"
+        type="text"
+        label="New Owner Address"
+        autoComplete="off"
+        value={fields.newOwner}
+        required
+        onChange={handleFieldChange}
+      />
+      {latestLogicContractAddress ? (
+        <LoaderButton color="secondary" onClick={handleUseLatestLogicContractDefinition}>
+          Use latest logic contract address
+        </LoaderButton>
+      ) : null}{' '}
       <LoaderButton loading={executing} onClick={handleUpgradeContract}>
         Upgrade to new logic contract
       </LoaderButton>
@@ -100,15 +149,3 @@ const UpgradeContract = ({ proxyContractAddress, onUpgrade }: UpgradeContractPro
   );
 };
 export default UpgradeContract;
-
-// todo: move this to parcel-contracts
-export const getProxyImplementationAddress = async (contract: Contract, provider: Provider) =>
-  toEthereumAddress(
-    BigNumber.from(
-      await readStorageValue(
-        provider,
-        contract.address,
-        getStorageLocationFromText('eip1967.proxy.implementation').sub(1),
-      ),
-    ),
-  );

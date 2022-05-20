@@ -11,6 +11,7 @@ import DetailField from '../../../common/typography/DetailField';
 import DetailTitle from '../../../common/typography/DetailTitle';
 import DetailValue from '../../../common/typography/DetailValue';
 import { useExecuteTransaction } from '../../../transactions/transactionHooks';
+import ContractLink from '../../ContractLink';
 
 export interface DefaultRoyaltyEditorProps {
   parcelNFT: ParcelNFT;
@@ -71,7 +72,9 @@ const DefaultRoyaltyEditor = ({ parcelNFT, onChange }: DefaultRoyaltyEditorProps
     <DetailField>
       <DetailTitle>Default Royalty</DetailTitle>
       <DetailTitle>Receiver</DetailTitle>
-      <DetailValue>{receiver}</DetailValue>
+      <DetailValue>
+        <ContractLink address={receiver} />
+      </DetailValue>
       <DetailTitle>Fee Numerator</DetailTitle>
       <DetailValue>{feeNumerator}</DetailValue>
       <DefaultTextField
