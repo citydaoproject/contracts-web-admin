@@ -2,6 +2,7 @@ import { ParcelNFT } from '@citydao/parcel-contracts/dist/types/contracts/Parcel
 import { useSnackbar } from 'notistack';
 import React from 'react';
 import { useFormFields } from '../../../../hooks/forms';
+import CopyToClipboard from '../../../common/actions/CopyToClipboard';
 import DefaultTextField from '../../../common/forms/DefaultTextField';
 import LoaderButton from '../../../common/forms/LoaderButton';
 import { newMerkleTreePath } from '../../../common/routes/paths';
@@ -47,7 +48,9 @@ const MerkleRootEditor = ({ parcelNFT, merkleRoot, onChange }: MerkleRootEditorP
   return (
     <DetailField>
       <DetailTitle>Merkle Root</DetailTitle>
-      <DetailValue>{merkleRoot}</DetailValue>
+      <DetailValue>
+        {merkleRoot} <CopyToClipboard text={merkleRoot} />
+      </DetailValue>
       <DefaultTextField
         name="merkleRoot"
         type="text"

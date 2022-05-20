@@ -18,7 +18,7 @@ export interface ContractLoaderHook<C extends Contract, K extends KeyOfGetterFun
 }
 
 export type ContractValues<C extends Contract, K extends KeyOfGetterFunction<C>> = {
-  [P in K]: Awaited<ReturnType<C[K]>>;
+  [P in K]: Awaited<ReturnType<C[K]> | null>;
 };
 
 export type KeyOfType<T, V> = keyof {
@@ -52,14 +52,10 @@ export const useContractLoader = <
       setValues(undefined);
       return;
     }
-    const [fetchedValues] = await Promise.all([Promise.all(keys.map((key) => contract[key]())), onFetch?.(contract)]);
 
-    setValues(
-      fetchedValues.reduce((acc, fetchedValue, index) => {
-        acc[keys[index]] = fetchedValue;
-        return acc;
-      }, {} as ContractValues<C, K>),
-    );
+    const [fetchedValues] = await Promise.all([fetchContractValues(contract, keys), onFetch?.(contract)]);
+
+    setValues(fetchedValues);
   };
 
   return { contract, values, refetch: fetchValues };
@@ -87,17 +83,37 @@ export const useInterfaceLoader = <C extends Contract, K extends KeyOfGetterFunc
       return;
     }
 
-    const [fetchedValues] = await Promise.all([Promise.all(keys.map((key) => contract[key]())), onFetch?.(contract)]);
+    const [fetchedValues] = await Promise.all([fetchContractValues(contract, keys), onFetch?.(contract)]);
 
-    setValues(
-      fetchedValues.reduce((acc, fetchedValue, index) => {
-        acc[keys[index]] = fetchedValue;
-        return acc;
-      }, {} as ContractValues<C, K>),
-    );
+    setValues(fetchedValues);
   };
 
   return { contract, values, refetch: fetchValues };
+};
+
+const fetchContractValues = async <C extends Contract, K extends KeyOfGetterFunction<C>>(
+  contract: C,
+  keys: K[],
+): Promise<ContractValues<C, K>> => {
+  const fetchedValues = await Promise.all(keys.map((key) => fetchContractValue(contract, key)));
+
+  return fetchedValues.reduce((acc, fetchedValue, index) => {
+    acc[keys[index]] = fetchedValue;
+    return acc;
+  }, {} as ContractValues<C, K>);
+};
+
+const fetchContractValue = async <C extends Contract, K extends KeyOfGetterFunction<C>>(
+  contract: C,
+  key: K,
+): Promise<C[K] | null> => {
+  try {
+    console.debug(`Fetching ${key}`);
+    return await contract[key]();
+  } catch (e) {
+    console.warn(`Error fetching ${key}:`, e);
+    return null;
+  }
 };
 
 export interface EthereumProviderHook {

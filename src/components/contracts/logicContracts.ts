@@ -2,6 +2,7 @@ import { ParcelNFT__factory } from '@citydao/parcel-contracts/dist/types/contrac
 import { ContractFactory } from 'ethers';
 import { requireNotNull } from '../../utils/check';
 import {
+  ownershipManagerDescription,
   parcelManagerRoleDescription,
   pauserRoleDescription,
   RoleDescription,
@@ -23,7 +24,13 @@ export const logicContractDefinitions: readonly LogicContractDefinition[] = [
   {
     type: LogicContractType.ParcelNFT,
     factory: () => new ParcelNFT__factory(),
-    roles: [superAdminRoleDescription, parcelManagerRoleDescription, pauserRoleDescription, upgraderRoleDescription],
+    roles: [
+      superAdminRoleDescription,
+      ownershipManagerDescription,
+      parcelManagerRoleDescription,
+      pauserRoleDescription,
+      upgraderRoleDescription,
+    ],
   },
 ];
 

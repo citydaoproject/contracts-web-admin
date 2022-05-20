@@ -9,12 +9,14 @@ import DetailTitle from '../../../common/typography/DetailTitle';
 import DetailValue from '../../../common/typography/DetailValue';
 import { useExecuteTransaction } from '../../../transactions/transactionHooks';
 import { useContractLoader } from '../../contractHooks';
+import { LogicContractType } from '../../logicContracts';
 import PauseContract from '../../PauseContract';
 import UpgradeContract from '../../UpgradeContract';
 import BaseURIEditor from './BaseURIEditor';
 import ClaimPeriodEditor from './ClaimPeriodEditor';
 import DefaultRoyaltyEditor from './DefaultRoyaltyEditor';
 import MerkleRootEditor from './MerkleRootEditor';
+import OwnerEditor from './OwnerEditor';
 import TokenRoyaltyEditor from './TokenRoyaltyEditor';
 import TokenURIEditor from './TokenURIEditor';
 
@@ -27,12 +29,12 @@ const ParcelNFTContractFields = ({ address }: ParcelNFTContractFieldsProps) => {
     contract: parcelNFT,
     values,
     refetch,
-  } = useContractLoader(new ParcelNFT__factory(), address, ['name', 'symbol', 'baseURI', 'merkleRoot']);
+  } = useContractLoader(new ParcelNFT__factory(), address, ['name', 'symbol', 'baseURI', 'merkleRoot', 'owner']);
 
   const { execute } = useExecuteTransaction();
 
   if (!values || !parcelNFT) {
-    return <div>Loading ParcelNFT Fields</div>;
+    return <em>Loading ParcelNFT Fields...</em>;
   }
 
   const handlePause = async () => Boolean(await execute(await parcelNFT.populateTransaction.pause()));
@@ -55,13 +57,14 @@ const ParcelNFTContractFields = ({ address }: ParcelNFTContractFieldsProps) => {
             <DetailValue>{values.symbol}</DetailValue>
           </DetailField>
           <PauseContract pauseableContractAddress={address} onPause={handlePause} onResume={handleResume} />
-          <BaseURIEditor parcelNFT={parcelNFT} baseURI={values.baseURI} onChange={refetch} />
+          <BaseURIEditor parcelNFT={parcelNFT} baseURI={values.baseURI || ''} onChange={refetch} />
           <TokenURIEditor parcelNFT={parcelNFT} />
           <ClaimPeriodEditor parcelNFT={parcelNFT} />
-          <MerkleRootEditor parcelNFT={parcelNFT} merkleRoot={values.merkleRoot} onChange={refetch} />
+          <MerkleRootEditor parcelNFT={parcelNFT} merkleRoot={values.merkleRoot || ''} onChange={refetch} />
           <DefaultRoyaltyEditor parcelNFT={parcelNFT} />
           <TokenRoyaltyEditor parcelNFT={parcelNFT} />
-          <UpgradeContract proxyContractAddress={address} />
+          {values.owner ? <OwnerEditor parcelNFT={parcelNFT} owner={values.owner} onChange={refetch} /> : null}
+          <UpgradeContract proxyContractAddress={address} type={LogicContractType.ParcelNFT} onUpgrade={refetch} />
         </AccordionDetails>
       </Accordion>
     </>
